@@ -13,6 +13,7 @@ def main():
     model, databaseEmbeddings = reloadModel()
 
     cap = cv2.VideoCapture(0)
+    # Melhorar processamento
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 
@@ -38,6 +39,9 @@ def main():
             model, databaseEmbeddings = reloadModel()
             print("\n\tModelo de reconhecimento ativo.\n")
             continue
+
+        elif key == ord("t"):
+            playVideo(os.path.join(os.path.dirname(__file__), './modules/tutorial/tutorial.mp4'))
 
         shouldersRoi = detectShoulders(frame)
         faces = detectFace(frame, roi=shouldersRoi)
@@ -65,6 +69,37 @@ def main():
     cap.release()
     cv2.destroyAllWindows()
 
+def playVideo(videoPath):
+    # Criar um objeto de captura de vídeo
+    cap = cv2.VideoCapture(videoPath)
+
+    # Verificar se o vídeo foi aberto corretamente
+    if not cap.isOpened():
+        print("Erro ao abrir o arquivo de vídeo.")
+        return
+
+    # Ler e exibir cada frame do vídeo
+    while True:
+        ret, frame = cap.read()
+
+        # Verificar se ainda há frames no vídeo
+        if not ret:
+            print("Fim do vídeo.")
+            break
+
+        # Exibir o frame
+        cv2.imshow("Video Player", frame)
+
+        # Aguardar 25ms e verificar se o usuário pressionou a tecla 'q'
+        if cv2.waitKey(25) & 0xFF == ord('q'):
+            break
+
+    # Liberar o objeto de captura e fechar todas as janelas
+    cap.release()
+    cv2.destroyAllWindows()
+
+
+
 
 # Função para o modo de registro de nova pessoa
 def registerNewPerson():
@@ -73,10 +108,15 @@ def registerNewPerson():
     os.makedirs(savePath, exist_ok=True)
 
     cap = cv2.VideoCapture(0)
+
+     # Melhorar processamento
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+    
     frameCount = 0
 
     print("Prepare-se para a captura de imagens.")
-    while frameCount < 10:
+    while frameCount < 60:
         ret, frame = cap.read()
         if not ret:
             break
@@ -88,17 +128,18 @@ def registerNewPerson():
         if len(faces) > 0:
             (x, y, w, h) = faces[0]  # Pega o primeiro rosto detectado
             faceRegion = frame[y:y + h, x:x + w]  # Recorta a região do rosto          
-            storePersonFrame(faceRegion, frameCount, savePath)  # Salva apenas a região do rosto
+
+            # Verifique se a região do rosto não está vazia antes de salvar
+            if faceRegion is not None and faceRegion.size != 0:
+                storePersonFrame(faceRegion, frameCount, savePath)
+                frameCount += 1
 
         else:
             print("Não está detectando sua face")
 
-
         cv2.imshow('Registro', frame)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
-
-        frameCount += 1
 
     cap.release()
     cv2.destroyAllWindows()

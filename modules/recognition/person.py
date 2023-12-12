@@ -1,4 +1,4 @@
-def recognizePerson(faceEmbedding, databaseEmbeddings, threshold=0.6):
+def recognizePerson(faceEmbedding, databaseEmbeddings, threshold=0.2):
     # Imports
     import numpy as np
 
@@ -21,6 +21,8 @@ def recognizePerson(faceEmbedding, databaseEmbeddings, threshold=0.6):
     # Calcular a confiança baseada na distância
     if minDistance < threshold:
         confidence = (1 - minDistance / threshold) * 100
+        if confidence < 75:  # Adicionar verificação de confiança extra
+            recognizedPerson = "Desconhecido"
     else:
         recognizedPerson = "Desconhecido"
         confidence = 0
