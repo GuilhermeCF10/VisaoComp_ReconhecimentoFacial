@@ -22,15 +22,10 @@ def storePersonFrame(frame, frameCount, savePath):
     file_path = os.path.join(savePath, file_name)
     
     # Salve o frame como uma imagem JPG
-    cv2.imwrite(file_path, frame)
-
-# # Certifique-se de que o frame não esteja vazio
-# if frame is not None and not frame.size == 0:
-#     # Crie o nome do arquivo usando o número do frame
-#     file_name = f"{frameCount}.jpg"
-
-#     # Combine o caminho do diretório e o nome do arquivo
-#     file_path = os.path.join(savePath, file_name)
-
-#     # Salve o frame como uma imagem JPG
-#     cv2.imwrite(file_path, frame)
+    success = cv2.imwrite(file_path, frame)
+    
+    # Adicione uma mensagem de log
+    if success:
+        print(f"Imagem salva com sucesso: {file_path}")
+    else:
+        print(f"Falha ao salvar a imagem: {file_path}")

@@ -1,4 +1,4 @@
 opencv-python==4.8.1.78
 opencv-python-headless==4.8.1.78
 numpy==1.26.2
-keyboard==0.13.5
+tqdm==4.66.1
