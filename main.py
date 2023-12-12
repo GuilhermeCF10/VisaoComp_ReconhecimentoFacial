@@ -1,21 +1,16 @@
 # Imports
 import os
 import cv2
-import numpy as np
-import time
 import uuid
 from modules.detection import detectShoulders, detectFace # Detection
 from modules.image import drawRectangle
 from modules.recognition import recognizePerson
-from modules.train import extractEmbeddings, trainData 
+from modules.train import extractEmbeddings, reloadModel
 from modules.store import storePersonFrame
 
 # Função principal
 def main():
-    trainData("./database/")
-
-    model = cv2.dnn.readNetFromTorch(os.path.join(os.path.dirname(__file__), './modules/train/model/openface.nn4.small2.v1.t7'))
-    databaseEmbeddings = np.load("./modules/train/database/databaseEmbeddings.npz")
+    model, databaseEmbeddings = reloadModel()
 
     cap = cv2.VideoCapture(0)
     MODE = "RECOGNITION"
@@ -103,14 +98,5 @@ def registerNewPerson():
 
     cap.release()
     cv2.destroyAllWindows()
-
-# Função para fazer reload do model
-def reloadModel():
-    print("\n\tRecarregando modelo...\n")
-    trainData("./database/")
-    model = cv2.dnn.readNetFromTorch(os.path.join(os.path.dirname(__file__), './modules/train/model/openface.nn4.small2.v1.t7'))
-    databaseEmbeddings = np.load("./modules/train/database/databaseEmbeddings.npz")
-    return model, databaseEmbeddings
-
 
 main()
