@@ -13,7 +13,8 @@ def main():
     model, databaseEmbeddings = reloadModel()
 
     cap = cv2.VideoCapture(0)
-    MODE = "RECOGNITION"
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 
     while True:
         ret, frame = cap.read()
@@ -22,6 +23,7 @@ def main():
 
         key = cv2.waitKey(1) & 0xFF
 
+        # Criar novo perfil
         if key == ord('n'):
             cap.release()
             cv2.destroyAllWindows()
@@ -31,7 +33,7 @@ def main():
             print("\n\tModelo de reconhecimento ativo.\n")
             continue
 
-    
+        # Forçar recarregamento do modelo
         elif key == ord('r'):
             model, databaseEmbeddings = reloadModel()
             print("\n\tModelo de reconhecimento ativo.\n")
@@ -45,14 +47,16 @@ def main():
 
             # Extrair a região do rosto e o embedding
             faceRegion = frame[y:y + h, x:x + w]
-            faceEmbedding = extractEmbeddings(model, faceRegion).flatten()
 
-            # Reconhecer a pessoa a partir do embedding
-            label = recognizePerson(faceEmbedding, databaseEmbeddings)
+            # Verifique se a região do rosto não está vazia antes de continuar
+            if faceRegion.size != 0:
+                faceEmbedding = extractEmbeddings(model, faceRegion).flatten()
 
-            # Desenhar retângulo e label no frame
-            frame = drawRectangle(frame, label, x, y, w, h)
+                # Reconhecer a pessoa a partir do embedding
+                label = recognizePerson(faceEmbedding, databaseEmbeddings)
 
+                # Desenhar retângulo e label no frame
+                frame = drawRectangle(frame, label, x, y, w, h)
 
         cv2.imshow('Reconhecimento', frame)
         if key == ord('q'):
